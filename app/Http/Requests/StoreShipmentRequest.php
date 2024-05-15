@@ -22,11 +22,11 @@ class StoreShipmentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'product_id' => 'required|exists:products,id',
-            'supplier_id' => 'required|exists:suppliers,id',
-            'branch_id' => 'required|exists:branches,id',
-            'quantity' => 'required|numeric',
-            'total' => 'required|numeric',
+            'product_id' => ['required', 'exists:products,id'],
+            'supplier_id' => ['required', 'exists:suppliers,id'],
+            'branch_id' => ['required', 'exists:branches,id'],
+            'quantity' => 'required|integer|min:1',
+            'total' => ['numeric'],
         ];
     }
 }

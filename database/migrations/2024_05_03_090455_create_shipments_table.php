@@ -17,8 +17,7 @@ return new class extends Migration
             $table->foreignId('branch_id')->constrained();
             $table->foreignId('supplier_id')->constrained();
             $table->integer('quantity');
-            $table->decimal('total', 8, 2);
-            $table->dateTime('shipment_date');
+            $table->decimal('total');
             $table->timestamps();
         });
     }

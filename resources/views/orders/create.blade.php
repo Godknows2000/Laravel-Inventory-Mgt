@@ -1,5 +1,5 @@
 <x-layout>
-    <div class="max-w-5xl mx-auto p-3 mt-10">
+    <div class="max-w-5xl mx-auto p-8 mt-10 md:w-6/12">
         <div class="card bg-white shadow-md rounded-lg">
             <div class="card-body p-6">
                 <h2 class="text-xl font-semibold mb-5">Create New Order</h2>
@@ -38,7 +38,7 @@
                             </div>
                         @endforeach
                     </div>
-                    </div>
+                </div>
                     <div class="card-footer bg-gray-100 text-right py-2 p-2">
                         <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                             Create Order

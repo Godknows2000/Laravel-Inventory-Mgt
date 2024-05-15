@@ -1,5 +1,7 @@
 <x-layout>
-    <div class="max-w-5xl mx-auto p-3 mt-22">
+    <div class="max-w-5xl mx-auto p-3 mt-22 md:w-8/12">
+    <div class="card bg-white shadow-md rounded-lg">
+            <div class="card-body p-6">
         <div class="mt-5">
             <h2 class="text-2xl font-semibold mb-3">Create Order Note</h2>
             <form action="{{ route('order-notes.store') }}" method="POST">
@@ -29,5 +31,7 @@
                 </div>
             </form>
         </div>
+</div>
+</div>
     </div>
 </x-layout>

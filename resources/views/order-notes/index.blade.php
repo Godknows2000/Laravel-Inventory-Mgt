@@ -7,7 +7,7 @@
                 </button>
             </a>
             <a href="{{ route('order-notes.create') }}">
-                <button class="hover:bg-gray-200 hover:text-black transition w-28 bg-gray-800 rounded h-8 px-2 text-white">
+                <button class="hover:bg-gray-200 hover:text-black transition w-40 bg-gray-800 rounded h-8 px-2 text-white">
                     Create Order Note
                 </button>
             </a>
@@ -29,6 +29,11 @@
                         </button>
                     </form>
                 </div>
+            @endcell
+
+            @cell('note', $orderNote)
+                {{-- Display each line from the order note textarea on its own line --}}
+                {!! nl2br(e($orderNote->note)) !!}
             @endcell
 
             @cell('status', $orderNote)

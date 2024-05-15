@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\OrderNote;
+use App\Models\Branch;
+use App\Models\Supplier;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\StoreOrderNoteRequest;
 use App\Http\Requests\UpdateOrderNoteRequest;
 use ProtoneMedia\Splade\Facades\Toast;
@@ -28,8 +31,12 @@ class OrderNoteController extends Controller
         });
     
         $orderNotes = QueryBuilder::for(OrderNote::class)
-            ->allowedFilters(['ordernote_number', 'branch_id', 'created_by', 'status', 'created_at', $globalSearch])
-            ->allowedSorts(['ordernote_number', 'branch_id', 'created_by', 'status', 'created_at'])
+            ->allowedFilters(['ordernote_number', 'branch_id', 'created_by', 'note', 'status', 'created_at', $globalSearch])
+            ->allowedSorts(['ordernote_number', 'branch_id', 'created_by', 'note', 'status', 'created_at'])
+            ->leftJoin('users', 'order_notes.created_by', '=', 'users.id')
+            ->leftJoin('branches', 'order_notes.branch_id', '=', 'branches.id')
+            ->select('order_notes.*', 'users.name as created_by', 'branches.name as branch')
+            ->with('createdByUser')
             ->paginate()
             ->withQueryString();
     
@@ -43,13 +50,13 @@ class OrderNoteController extends Controller
                     searchable: true
                 )
                 ->column(
-                    'branch_id',
+                    'note',
                     canBeHidden: false,
                     sortable: true,
-                    searchable: true
+                    searchable: false
                 )
                 ->column(
-                    'created_by',
+                    'branch',
                     canBeHidden: false,
                     sortable: true,
                     searchable: true
@@ -59,6 +66,12 @@ class OrderNoteController extends Controller
                     canBeHidden: false,
                     sortable: true,
                     searchable: true
+                )
+                ->column(
+                    'created_by',
+                    canBeHidden: false,
+                    sortable: true,
+                    searchable: true,                  
                 )
                 ->column('created_at', sortable: true, searchable: true)
                 ->column('action'),
@@ -70,7 +83,8 @@ class OrderNoteController extends Controller
      */
     public function create()
     {
-        return view('order-notes.create');
+        $branches = Branch::all();
+        return view('order-notes.create', compact('branches'));
     }
 
     /**
@@ -78,7 +92,17 @@ class OrderNoteController extends Controller
      */
     public function store(StoreOrderNoteRequest $request)
     {
-        $orderNote = OrderNote::create($request->validated());
+        // Retrieve the ID of the authenticated user
+        $createdBy = Auth::id();
+
+        // Create the order note with the authenticated user's ID
+        $orderNote = OrderNote::create([
+            'ordernote_number' => $request->ordernote_number,
+            'branch_id' => $request->branch_id,
+            'created_by' => $createdBy,
+            'note' => $request->note,
+            'status' => $request->status,
+        ]);
         Toast::title('Success')->message('Order note created successfully!')->success();
         return redirect()->route('order-notes.index');
     }

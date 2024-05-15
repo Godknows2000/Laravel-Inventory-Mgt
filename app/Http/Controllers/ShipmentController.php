@@ -3,8 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Models\Shipment;
+use App\Models\Branch;
+use App\Models\Supplier;
+use App\Models\Product;
 use App\Http\Requests\StoreShipmentRequest;
 use App\Http\Requests\UpdateShipmentRequest;
+use ProtoneMedia\Splade\Facades\Toast;
+use Spatie\QueryBuilder\AllowedFilter;
+use Spatie\QueryBuilder\QueryBuilder;
+use ProtoneMedia\Splade\SpladeTable;
 
 class ShipmentController extends Controller
 {
@@ -22,29 +29,39 @@ class ShipmentController extends Controller
             });
         });
     
-        $suppliers = QueryBuilder::for(Supplier::class)
+        $shipments = QueryBuilder::for(Shipment::class)
             ->allowedFilters(['id', 'product_id', 'branch_id', 'supplier_id', 'quantity', 'total', 'created_at', $globalSearch])
             ->allowedSorts(['id', 'product_id', 'branch_id', 'supplier_id', 'quantity', 'total', 'created_at'])
+            ->leftJoin('products', 'shipments.product_id', '=', 'products.id')
+            ->leftJoin('branches', 'shipments.branch_id', '=', 'branches.id')
+            ->leftJoin('suppliers', 'shipments.supplier_id', '=', 'suppliers.id')
+            ->select('shipments.*', 'products.name as product', 'branches.name as branch', 'suppliers.name as supplier')
             ->paginate()
             ->withQueryString();
     
         return view('shipments.index', [
-            'suppliers' => SpladeTable::for($shipments)
+            'shipments' => SpladeTable::for($shipments)
                 ->withGlobalSearch()
                 ->column(
-                    'product_id',
+                    'product',
                     canBeHidden: false,
                     sortable: true,
                     searchable: true
                 )
                 ->column(
-                    'branch_id',
+                    'branch',
                     canBeHidden: false,
                     sortable: true,
                     searchable: true
                 )
                 ->column(
-                    'supplier_id',
+                    'supplier',
+                    canBeHidden: false,
+                    sortable: true,
+                    searchable: true
+                )
+                ->column(
+                    'quantity',
                     canBeHidden: false,
                     sortable: true,
                     searchable: true
@@ -65,7 +82,10 @@ class ShipmentController extends Controller
      */
     public function create()
     {
-        //
+        $branches = Branch::all();
+        $suppliers = Supplier::all();
+        $products = Product::all();
+        return view('shipments.create', compact('branches', 'suppliers', 'products'));
     }
 
     /**
@@ -73,7 +93,29 @@ class ShipmentController extends Controller
      */
     public function store(StoreShipmentRequest $request)
     {
-        //
+        // Retrieve the product
+        $product = Product::findOrFail($request->product_id);
+
+        // Calculate the total based on the requested quantity
+        $total = $product->price * $request->quantity;
+
+        // Create the shipment
+        $shipment = Shipment::create([
+            'product_id' => $request->product_id,
+            'supplier_id' => $request->supplier_id,
+            'branch_id' => $request->branch_id,
+            'quantity' => $request->quantity,
+            'total' => $total,
+        ]);
+
+        // Increase the product quantity
+        $product->increment('quantity', $request->quantity);
+
+        // Toast success message
+        Toast::title('Success')->message('Shipment created successfully!')->success();
+
+        // Redirect to the index page
+        return redirect()->route('shipments.index');
     }
 
     /**
@@ -89,7 +131,7 @@ class ShipmentController extends Controller
      */
     public function edit(Shipment $shipment)
     {
-        //
+        return view('shipments.edit', compact('shipment'));
     }
 
     /**
@@ -97,7 +139,9 @@ class ShipmentController extends Controller
      */
     public function update(UpdateShipmentRequest $request, Shipment $shipment)
     {
-        //
+        $shipment->update($request->validated());
+        Toast::title('Success')->message('Shipment updated successfully!')->success();
+        return redirect()->route('shipments.index');
     }
 
     /**
