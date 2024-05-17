@@ -38,13 +38,14 @@
                             </div>
                         @endforeach
                     </div>
+                </div> <!-- Close card-body -->
+                
+                <div class="card-footer bg-gray-100 text-right py-2 p-2">
+                    <button type="submit" onclick="console.log('Button clicked!')" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                        Create Order
+                    </button>
                 </div>
-                    <div class="card-footer bg-gray-100 text-right py-2 p-2">
-                        <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                            Create Order
-                        </button>
-                    </div>
-                </form>
+            </form> <!-- Close form -->
         </div>
     </div>
 

@@ -91,29 +91,35 @@ class OrderController extends Controller
             'quantities' => 'required|array',
             'quantities.*' => 'integer|min:1',
         ]);
-    
+
         try {
             DB::beginTransaction();
-    
-            foreach ($validatedData['products'] as $key => $productId) {
-                $product = Product::findOrFail($productId);
-    
-                // Decrement product quantity
-                $quantity = $validatedData['quantities'][$key];
-                $product->decrement('quantity', $quantity);
-            }
-    
+
             // Create the order
             $order = Order::create([
                 'student_id' => $validatedData['student_id'],
-                // Add any other fields if needed
             ]);
-    
-            // Attach products to the order with quantities
-            $order->products()->attach($validatedData['products'], ['quantity' => $quantity]);
-    
+
+            foreach ($validatedData['products'] as $key => $productId) {
+                $product = Product::findOrFail($productId);
+                $quantity = $validatedData['quantities'][$key];
+
+                // Decrement product quantity
+                $product->decrement('quantity', $quantity);
+
+                // Attach product to the order with quantity
+                $order->products()->attach($productId, ['quantity' => $quantity]);
+            }
+
             DB::commit();
-    
+
+            // Generate PDF receipt
+            $pdf = PDF::loadView('receipt', ['order' => $order]);
+            $pdf->save(public_path('receipts/order_'.$order->id.'.pdf'));
+
+            Toast::title('Success')->message('Order created successfully!')->success();
+            return redirect()->route('orders.index');
+
             return response()->json([
                 'message' => 'Order created successfully',
                 'order_id' => $order->id,

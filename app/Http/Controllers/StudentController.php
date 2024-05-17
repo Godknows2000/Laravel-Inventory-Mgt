@@ -31,8 +31,8 @@ class StudentController extends Controller
         $students = QueryBuilder::for(Student::class)
             ->allowedFilters(['id', 'name',  'phone', 'email', 'address', 'branch', 'created_at', $globalSearch])
             ->allowedSorts(['id', 'name', 'phone', 'email', 'address', 'branch', 'created_at'])
-            ->leftJoin('branches', 'students.branch_id', '=', 'students.id')
-            ->select('students.*', 'branches.name as branch_name')
+            ->leftJoin('branches', 'students.branch_id', '=', 'branches.id')
+            ->select('students.*', 'branches.name as name')
             ->paginate()
             ->withQueryString();
     
@@ -65,7 +65,7 @@ class StudentController extends Controller
                     searchable: true
                 )
                 ->column(
-                    'branch_name',
+                    'name',
                     canBeHidden: false,
                     sortable: true,
                     searchable: true
