@@ -15,7 +15,13 @@ export default {
     ],
 
     theme: {
-        extend: {},
+        extend: {
+            colors: {
+                black1: '#fbc33b',
+                blue1: '#003087',
+
+            },
+        },
     },
 
     plugins: [forms, typography],

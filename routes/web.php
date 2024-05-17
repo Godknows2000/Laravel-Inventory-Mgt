@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\CategoryController;
@@ -26,7 +27,7 @@ use App\Http\Controllers\OrderNoteController;
 
 Route::middleware(['splade'])->group(function () {
     Route::middleware('auth')->group(function () {
-    Route::get('/', fn () => view('home'));
+    Route::resource('/', DashboardController::class);
     Route::get('/home', fn () => view('home'))->name('home');
     Route::resource('/suppliers', SupplierController::class);
     Route::resource('/categories', CategoryController::class);
