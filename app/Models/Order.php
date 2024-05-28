@@ -11,10 +11,9 @@ class Order extends Model
 
     protected $fillable = [
         'branch_id',
-        'product_id',
         'student_id',
-        'quantity',
         'total',
+        'status',
     ];
 
     public function branch()
@@ -22,13 +21,15 @@ class Order extends Model
         return $this->belongsTo(Branch::class);
     }
 
-    public function product()
-    {
-        return $this->belongsTo(Product::class);
-    }
-
     public function student()
     {
         return $this->belongsTo(Student::class);
+    }
+
+    public function products()
+    {
+        return $this->belongsToMany(Product::class, 'order_product')
+                    ->withPivot('quantity', 'price')
+                    ->withTimestamps();
     }
 }

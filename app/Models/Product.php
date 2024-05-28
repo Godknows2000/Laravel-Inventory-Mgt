@@ -11,23 +11,23 @@ class Product extends Model
     use HasFactory;
 
     protected $fillable = [
-        'name',
-        'category_id',
-        'branch_id',
-        'quantity',
-        'description',
-        'price',
-        'size',
-        'type',
+        'name', 'price', 'quantity', 'branch_id', 'category_id', 'description', 'size', 'type'
     ];
 
-    public function category()
+    public function orders()
     {
-        return $this->belongsTo(Category::class);
+        return $this->belongsToMany(Order::class, 'order_product')
+                    ->withPivot('quantity', 'price')
+                    ->withTimestamps();
     }
 
     public function branch()
     {
         return $this->belongsTo(Branch::class);
+    }
+
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
     }
 }

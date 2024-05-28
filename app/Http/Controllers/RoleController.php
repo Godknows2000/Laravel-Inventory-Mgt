@@ -38,7 +38,6 @@ class RoleController extends Controller
             'roles' => SpladeTable::for($roles)
                 ->defaultSort('name')
                 ->withGlobalSearch()
-                ->column('id', sortable: true, searchable: true)
                 ->column(
                     'name',
                     canBeHidden: false,

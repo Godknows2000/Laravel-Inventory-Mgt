@@ -38,9 +38,12 @@ Route::middleware(['splade'])->group(function () {
     Route::resource('/stocks', StockController::class);
     Route::resource('/branches', BranchController::class);
     Route::resource('/orders', OrderController::class);
+    Route::get('api/products', [OrderController::class, 'getProductsByBranch']);
     Route::resource('/shipments', ShipmentController::class);
     Route::resource('/students', StudentController::class);
     Route::resource('/order-notes', OrderNoteController::class);
+    Route::get('/orders/download-daily-sales', [OrderController::class, 'downloadDailySales'])->name('orders.downloadDailySales');
+    Route::get('/products/monthly', [ProductController::class, 'viewMonthlyStocks'])->name('products.viewMonthly');
     });
 
     // Registers routes to support the interactive components...

@@ -84,6 +84,15 @@ class ProductController extends Controller
         ]);
     }
 
+    public function viewMonthlyStocks()
+    {
+        $stocks = Product::selectRaw('MONTH(created_at) as month, SUM(quantity) as total_quantity')
+            ->groupBy('month')
+            ->get();
+
+        return view('products.monthly', compact('products'));
+    }
+
     /**
      * Show the form for creating a new resource.
      */
